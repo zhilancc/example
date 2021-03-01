@@ -19,6 +19,25 @@ $encry_str = $rsa->publicEncrypt($str);
 echo "字符串({$str})公钥加密后：{$encry_str}" . PHP_EOL;
 echo "加密字符串({$encry_str})私钥解密后：{$rsa->privateDecrypt($encry_str)}" . PHP_EOL;
 
+echo PHP_EOL . "========================= md5WithRSAEncryption =========================" . PHP_EOL;
+$str = 'Hello World.';
+$signature = '';
+$rs = openssl_get_privatekey("file://storage/rsa_private_key.pem", '');
+if (openssl_sign($str, $signature, $rs, OPENSSL_ALGO_MD5)) {
+    $signature = base64_encode($signature);
+}
+echo "字符串({$str})私钥加密后：{$signature}" . PHP_EOL;
+$rs = openssl_get_publickey("file://storage/rsa_public_key.pem");
+$res = openssl_verify($str, base64_decode($signature), $rs, OPENSSL_ALGO_MD5);
+if ($res == 1) {
+    echo "md5WithRSAEncryption 加密验证成功" . PHP_EOL;
+} else if ($res == 0) {
+    echo "md5WithRSAEncryption 加密验证失败" . PHP_EOL;
+} else {
+    echo "错误的校验" . PHP_EOL;
+}
+openssl_free_key($rs);
+
 echo PHP_EOL . "========================= sha1WithRSAEncryption =========================" . PHP_EOL;
 $str = 'Hello World.';
 $signature = '';
